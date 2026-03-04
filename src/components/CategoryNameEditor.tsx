@@ -47,9 +47,11 @@ export function CategoryNameEditor({ categoryId, name, onError }: CategoryNameEd
           fontSize: '0.875rem',
           fontWeight: 500,
           width: '100%',
-          borderBottom: '1.5px solid',
-          borderColor: 'primary.main',
-          px: 0.25,
+          border: '1px solid',
+          borderColor: 'divider',
+          borderRadius: '4px',
+          px: 0.75,
+          py: 0.25,
         }}
       />
     );
@@ -60,8 +62,7 @@ export function CategoryNameEditor({ categoryId, name, onError }: CategoryNameEd
       variant="body2"
       fontWeight={500}
       onClick={() => setEditing(true)}
-      title="클릭하여 편집"
-      sx={{ cursor: 'pointer', '&:hover': { color: 'primary.main' } }}
+      sx={{ cursor: 'text' }}
     >
       {name}
     </Typography>

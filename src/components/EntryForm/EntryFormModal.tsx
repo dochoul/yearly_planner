@@ -113,6 +113,7 @@ export function EntryFormModal({
               날짜
             </Typography>
             <DateInput
+              year={year}
               dateType={dateType}
               onDateTypeChange={setDateType}
               dateValue={dateValue}

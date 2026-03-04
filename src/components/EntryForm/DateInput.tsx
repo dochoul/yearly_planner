@@ -1,11 +1,13 @@
+import Box from '@mui/material/Box';
 import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import FormControlLabel from '@mui/material/FormControlLabel';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import dayjs, { type Dayjs } from 'dayjs';
 import type { DateType } from '../../types';
 
 interface DateInputProps {
+  year: number;
   dateType: DateType;
   onDateTypeChange: (type: DateType) => void;
   dateValue: string;
@@ -16,14 +18,36 @@ interface DateInputProps {
   onDateToChange: (v: string) => void;
 }
 
+// "M/D" 문자열 → Dayjs (해당 연도 기준)
+function parseMD(value: string, year: number): Dayjs | null {
+  if (!value) return null;
+  const [m, d] = value.split('/').map(Number);
+  if (!m || !d) return null;
+  return dayjs(`${year}-${m}-${d}`);
+}
+
+// Dayjs → "M/D" 문자열
+function formatMD(date: Dayjs | null): string {
+  if (!date || !date.isValid()) return '';
+  return `${date.month() + 1}/${date.date()}`;
+}
+
+const pickerSlotProps = {
+  textField: { size: 'small' as const },
+};
+
 export function DateInput({
+  year,
   dateType, onDateTypeChange,
   dateValue, onDateValueChange,
   dateFrom, onDateFromChange,
   dateTo, onDateToChange,
 }: DateInputProps) {
+  const minDate = dayjs(`${year}-01-01`);
+  const maxDate = dayjs(`${year}-12-31`);
+
   return (
-    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1 }}>
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 1.5 }}>
       <RadioGroup
         row
         value={dateType}
@@ -32,30 +56,36 @@ export function DateInput({
         <FormControlLabel value="single" control={<Radio size="small" />} label="단일 날짜" />
         <FormControlLabel value="range" control={<Radio size="small" />} label="기간" />
       </RadioGroup>
+
       {dateType === 'single' ? (
-        <TextField
-          size="small"
-          fullWidth
-          value={dateValue}
-          onChange={(e) => onDateValueChange(e.target.value)}
-          placeholder="예: 1/6"
-        />
+        <Box sx={{ width: '50%' }}>
+          <DatePicker
+            value={parseMD(dateValue, year)}
+            onChange={(date) => onDateValueChange(formatMD(date))}
+            minDate={minDate}
+            maxDate={maxDate}
+            format="M월 D일"
+            slotProps={pickerSlotProps}
+          />
+        </Box>
       ) : (
         <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
-          <TextField
-            size="small"
-            value={dateFrom}
-            onChange={(e) => onDateFromChange(e.target.value)}
-            placeholder="예: 1/8"
-            sx={{ width: 110 }}
+          <DatePicker
+            value={parseMD(dateFrom, year)}
+            onChange={(date) => onDateFromChange(formatMD(date))}
+            minDate={minDate}
+            maxDate={maxDate}
+            format="M월 D일"
+            slotProps={pickerSlotProps}
           />
-          <span>~</span>
-          <TextField
-            size="small"
-            value={dateTo}
-            onChange={(e) => onDateToChange(e.target.value)}
-            placeholder="예: 1/12"
-            sx={{ width: 110 }}
+          <span style={{ flexShrink: 0, color: '#9ca3af' }}>~</span>
+          <DatePicker
+            value={parseMD(dateTo, year)}
+            onChange={(date) => onDateToChange(formatMD(date))}
+            minDate={minDate}
+            maxDate={maxDate}
+            format="M월 D일"
+            slotProps={pickerSlotProps}
           />
         </Box>
       )}

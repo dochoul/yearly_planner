@@ -1,7 +1,7 @@
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
-import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
 import type { Category, WorkEntry } from '../../types';
 import { useDeleteCategory } from '../../hooks/useCategories';
 import { CategoryNameEditor } from '../CategoryNameEditor';
@@ -38,19 +38,27 @@ export function CategoryRow({ category, entries, year, onError }: CategoryRowPro
         }}
       >
         <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <CategoryNameEditor
-            categoryId={category.id}
-            name={category.name}
-            onError={onError}
-          />
+          <div style={{ flex: 1, minWidth: 0 }}>
+            <CategoryNameEditor
+              categoryId={category.id}
+              name={category.name}
+              onError={onError}
+            />
+          </div>
           <IconButton
             className="delete-btn"
             onClick={handleDelete}
             size="small"
-            color="error"
-            sx={{ visibility: 'hidden', p: 0.25, ml: 'auto', flexShrink: 0 }}
+            sx={{
+              visibility: 'hidden',
+              ml: 'auto',
+              flexShrink: 0,
+              p: 0.25,
+              color: 'text.disabled',
+              '&:hover': { color: 'error.main' },
+            }}
           >
-            <DeleteIcon sx={{ fontSize: 14 }} />
+            <CloseIcon sx={{ fontSize: 14 }} />
           </IconButton>
         </div>
       </TableCell>

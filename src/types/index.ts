@@ -1,4 +1,4 @@
-export type EntryColor = 'red' | 'yellow' | 'green' | 'blue' | 'white' | 'black';
+export type EntryColor = 'red' | 'orange' | 'green' | 'blue';
 export type DateType = 'single' | 'range';
 
 export interface Category {

@@ -4,7 +4,7 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
-import DeleteIcon from '@mui/icons-material/Delete';
+import CloseIcon from '@mui/icons-material/Close';
 import type { WorkEntry } from '../../types';
 import { HIGHLIGHT_BG } from '../../constants';
 import { EntryFormModal } from '../EntryForm/EntryFormModal';
@@ -50,24 +50,30 @@ export function WorkCell({ categoryId, month, year, entries, onError }: WorkCell
             <Box
               key={entry.id}
               sx={{
+                position: 'relative',
                 display: 'flex',
                 alignItems: 'flex-start',
                 gap: 0.5,
-                '&:hover .entry-actions': { visibility: 'visible' },
+                borderRadius: '6px',
+                px: 0.5,
+                py: 0.25,
+                mx: -0.5,
+                '&:hover': { bgcolor: 'rgba(0,0,0,0.04)' },
+                '&:hover .entry-actions': { opacity: 1 },
               }}
             >
               <span
                 style={{
-                  marginTop: 3,
-                  width: 8,
-                  height: 8,
+                  marginTop: 2,
+                  width: 16,
+                  height: 16,
                   borderRadius: '50%',
                   flexShrink: 0,
                   backgroundColor: COLOR_DOT[entry.color],
                   display: 'inline-block',
                 }}
               />
-              <Box sx={{ flex: 1, lineHeight: 1.3 }}>
+              <Box sx={{ flex: 1, lineHeight: 1.3, pr: 5 }}>
                 <Typography variant="caption">{entry.text}</Typography>
                 {' '}
                 <span
@@ -79,21 +85,30 @@ export function WorkCell({ categoryId, month, year, entries, onError }: WorkCell
               </Box>
               <Box
                 className="entry-actions"
-                sx={{ visibility: 'hidden', display: 'flex', gap: 0.25, flexShrink: 0 }}
+                sx={{
+                  position: 'absolute',
+                  right: 4,
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  display: 'flex',
+                  gap: 0.25,
+                  opacity: 0,
+                  transition: 'opacity 0.1s ease',
+                }}
               >
                 <IconButton
                   size="small"
                   onClick={() => setEditingEntry(entry)}
-                  sx={{ p: 0.25, color: 'text.disabled', '&:hover': { color: 'primary.main' } }}
+                  sx={{ p: 0.5, color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'primary.50' } }}
                 >
-                  <EditIcon sx={{ fontSize: 11 }} />
+                  <EditIcon sx={{ fontSize: 14 }} />
                 </IconButton>
                 <IconButton
                   size="small"
                   onClick={() => handleDelete(entry.id)}
-                  sx={{ p: 0.25, color: 'text.disabled', '&:hover': { color: 'error.main' } }}
+                  sx={{ p: 0.5, color: 'text.secondary', '&:hover': { color: 'error.main', bgcolor: 'error.50' } }}
                 >
-                  <DeleteIcon sx={{ fontSize: 11 }} />
+                  <CloseIcon sx={{ fontSize: 14 }} />
                 </IconButton>
               </Box>
             </Box>
