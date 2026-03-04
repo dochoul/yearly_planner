@@ -1,10 +1,11 @@
+import { useState } from 'react';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
-import CloseIcon from '@mui/icons-material/Close';
+import Typography from '@mui/material/Typography';
+import EditIcon from '@mui/icons-material/Edit';
 import type { Category, WorkEntry } from '../../types';
-import { useDeleteCategory } from '../../hooks/useCategories';
-import { CategoryNameEditor } from '../CategoryNameEditor';
+import { CategoryEditModal } from '../CategoryEditModal';
 import { WorkCell } from './WorkCell';
 
 interface CategoryRowProps {
@@ -15,63 +16,61 @@ interface CategoryRowProps {
 }
 
 export function CategoryRow({ category, entries, year, onError }: CategoryRowProps) {
-  const deleteCategory = useDeleteCategory();
-
-  const handleDelete = () => {
-    if (!window.confirm(`"${category.name}" 카테고리와 모든 업무 기록을 삭제할까요?`)) return;
-    deleteCategory.mutate(category.id, {
-      onError: () => onError('카테고리 삭제에 실패했습니다.'),
-    });
-  };
+  const [modalOpen, setModalOpen] = useState(false);
 
   return (
-    <TableRow sx={{ '&:hover .delete-btn': { visibility: 'visible' } }}>
-      <TableCell
-        sx={{
-          position: 'sticky',
-          left: 0,
-          zIndex: 10,
-          bgcolor: 'background.paper',
-          verticalAlign: 'top',
-          py: 1,
-          px: 1.5,
-        }}
-      >
-        <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <CategoryNameEditor
-              categoryId={category.id}
-              name={category.name}
-              onError={onError}
-            />
+    <>
+      <TableRow sx={{ '&:hover .edit-btn': { visibility: 'visible' } }}>
+        <TableCell
+          sx={{
+            position: 'sticky',
+            left: 0,
+            zIndex: 10,
+            bgcolor: 'background.paper',
+            verticalAlign: 'top',
+            py: 1,
+            px: 1.5,
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+            <Typography variant="body2" fontWeight={500} sx={{ flex: 1, minWidth: 0 }}>
+              {category.name}
+            </Typography>
+            <IconButton
+              className="edit-btn"
+              onClick={() => setModalOpen(true)}
+              size="small"
+              sx={{
+                visibility: 'hidden',
+                ml: 'auto',
+                flexShrink: 0,
+                p: 0.25,
+                color: 'text.disabled',
+                '&:hover': { color: 'primary.main' },
+              }}
+            >
+              <EditIcon sx={{ fontSize: 14 }} />
+            </IconButton>
           </div>
-          <IconButton
-            className="delete-btn"
-            onClick={handleDelete}
-            size="small"
-            sx={{
-              visibility: 'hidden',
-              ml: 'auto',
-              flexShrink: 0,
-              p: 0.25,
-              color: 'text.disabled',
-              '&:hover': { color: 'error.main' },
-            }}
-          >
-            <CloseIcon sx={{ fontSize: 14 }} />
-          </IconButton>
-        </div>
-      </TableCell>
-      {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
-        <WorkCell
-          key={month}
-          categoryId={category.id}
-          month={month}
-          year={year}
-          entries={entries.get(month) ?? []}
-          onError={onError}
-        />
-      ))}
-    </TableRow>
+        </TableCell>
+        {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+          <WorkCell
+            key={month}
+            categoryId={category.id}
+            month={month}
+            year={year}
+            entries={entries.get(month) ?? []}
+            onError={onError}
+          />
+        ))}
+      </TableRow>
+      <CategoryEditModal
+        isOpen={modalOpen}
+        onClose={() => setModalOpen(false)}
+        categoryId={category.id}
+        categoryName={category.name}
+        onError={onError}
+      />
+    </>
   );
 }

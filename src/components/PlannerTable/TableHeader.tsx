@@ -27,13 +27,13 @@ export function TableHeader({ colWidths, onResize }: TableHeaderProps) {
   };
 
   const headerCellSx = {
-    bgcolor: '#ebf2fe',
-    color: '#1c2b4b',
-    fontWeight: 800,
-    fontSize: '0.875rem',
-    letterSpacing: '0.04em',
-    borderColor: '#ccd4e3',
-    py: 1.5,
+    bgcolor: '#dce8fb',
+    color: '#1e3a5f',
+    fontWeight: 700,
+    fontSize: '0.85rem',
+    letterSpacing: '0.02em',
+    borderColor: '#c2d4ee',
+    py: 1.25,
     position: 'sticky' as const,
     top: 0,
     zIndex: 20,

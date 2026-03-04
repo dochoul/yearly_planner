@@ -3,14 +3,12 @@ import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
-import EditIcon from '@mui/icons-material/Edit';
 import CloseIcon from '@mui/icons-material/Close';
 import type { WorkEntry } from '../../types';
-import { HIGHLIGHT_BG } from '../../constants';
 import { EntryFormModal } from '../EntryForm/EntryFormModal';
 import { useDeleteWorkEntry } from '../../hooks/useWorkEntries';
 
-const COLOR_DOT: Record<string, string> = {
+const COLOR_BG: Record<string, string> = {
   red: '#ef4444',
   blue: '#3b82f6',
   green: '#22c55e',
@@ -30,100 +28,86 @@ export function WorkCell({ categoryId, month, year, entries, onError }: WorkCell
   const [editingEntry, setEditingEntry] = useState<WorkEntry | null>(null);
   const deleteEntry = useDeleteWorkEntry(year);
 
-  const handleDelete = (id: string) => {
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
     if (!window.confirm('이 업무 항목을 삭제할까요?')) return;
     deleteEntry.mutate(id, {
       onError: () => onError('업무 항목 삭제에 실패했습니다.'),
     });
   };
 
-  const formatDate = (entry: WorkEntry) => {
-    if (entry.date_type === 'single') return entry.date_value ? `(${entry.date_value})` : '';
-    return entry.date_from && entry.date_to ? `(${entry.date_from}~${entry.date_to})` : '';
-  };
-
   return (
     <>
-      <TableCell sx={{ verticalAlign: 'top', px: 1, py: 0.75 }}>
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+      <TableCell sx={{ verticalAlign: 'middle', px: 1.5, py: 1 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.75 }}>
           {entries.map((entry) => (
             <Box
               key={entry.id}
+              onClick={() => setEditingEntry(entry)}
               sx={{
                 position: 'relative',
                 display: 'flex',
-                alignItems: 'flex-start',
-                gap: 0.5,
+                alignItems: 'center',
+                gap: 0.75,
+                bgcolor: COLOR_BG[entry.color],
                 borderRadius: '6px',
-                px: 0.5,
-                py: 0.25,
-                mx: -0.5,
-                '&:hover': { bgcolor: 'rgba(0,0,0,0.04)' },
-                '&:hover .entry-actions': { opacity: 1 },
+                px: 1,
+                py: 0.5,
+                cursor: 'pointer',
+                overflow: 'hidden',
+                '&:hover .delete-btn': { opacity: 1 },
               }}
             >
               <span
                 style={{
-                  marginTop: 2,
-                  width: 16,
-                  height: 16,
+                  width: 8,
+                  height: 8,
                   borderRadius: '50%',
+                  background: 'rgba(255,255,255,0.65)',
                   flexShrink: 0,
-                  backgroundColor: COLOR_DOT[entry.color],
-                  display: 'inline-block',
                 }}
               />
-              <Box sx={{ flex: 1, lineHeight: 1.3, pr: 5 }}>
-                <Typography variant="caption">{entry.text}</Typography>
-                {' '}
-                <span
-                  className={entry.highlight ? HIGHLIGHT_BG[entry.color] : ''}
-                  style={!entry.highlight ? { color: '#9ca3af', fontSize: '0.75rem' } : { fontSize: '0.75rem', borderRadius: 2, padding: '0 2px' }}
-                >
-                  {formatDate(entry)}
-                </span>
-              </Box>
-              <Box
-                className="entry-actions"
+              <Typography
+                variant="caption"
                 sx={{
-                  position: 'absolute',
-                  right: 4,
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  display: 'flex',
-                  gap: 0.25,
-                  opacity: 0,
-                  transition: 'opacity 0.1s ease',
+                  color: 'white',
+                  fontWeight: 600,
+                  flex: 1,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  lineHeight: 1.4,
                 }}
               >
-                <IconButton
-                  size="small"
-                  onClick={() => setEditingEntry(entry)}
-                  sx={{ p: 0.5, color: 'text.secondary', '&:hover': { color: 'primary.main', bgcolor: 'primary.50' } }}
-                >
-                  <EditIcon sx={{ fontSize: 14 }} />
-                </IconButton>
-                <IconButton
-                  size="small"
-                  onClick={() => handleDelete(entry.id)}
-                  sx={{ p: 0.5, color: 'text.secondary', '&:hover': { color: 'error.main', bgcolor: 'error.50' } }}
-                >
-                  <CloseIcon sx={{ fontSize: 14 }} />
-                </IconButton>
-              </Box>
+                {entry.text}
+              </Typography>
+              <IconButton
+                className="delete-btn"
+                size="small"
+                onClick={(e) => handleDelete(e, entry.id)}
+                sx={{
+                  opacity: 0,
+                  transition: 'opacity 0.1s',
+                  p: 0.25,
+                  color: 'rgba(255,255,255,0.85)',
+                  '&:hover': { bgcolor: 'rgba(0,0,0,0.2)', color: 'white' },
+                }}
+              >
+                <CloseIcon sx={{ fontSize: 12 }} />
+              </IconButton>
             </Box>
           ))}
 
-          {/* 항상 고정된 추가 버튼 */}
           <Typography
             variant="caption"
             onClick={() => setIsAddOpen(true)}
             sx={{
-              color: 'text.disabled',
+              color: '#9ca3af',
               cursor: 'pointer',
               userSelect: 'none',
-              mt: entries.length > 0 ? 0.25 : 0,
-              '&:hover': { color: 'primary.main' },
+              textAlign: 'center',
+              py: 0.25,
+              '&:hover': { color: '#4b5563' },
             }}
           >
             + 추가

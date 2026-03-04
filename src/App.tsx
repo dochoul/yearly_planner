@@ -1,7 +1,6 @@
 import { useState, useCallback } from 'react';
 import { createTheme, ThemeProvider, CssBaseline } from '@mui/material';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
 import { PlannerTable } from './components/PlannerTable/PlannerTable';
 import { Toast } from './components/Toast';
 
@@ -24,13 +23,8 @@ export default function App() {
   return (
     <ThemeProvider theme={theme}>
       <CssBaseline />
-      <Box sx={{ minHeight: '100vh', bgcolor: 'grey.50', p: 2 }}>
-        <Box sx={{ width: '100%', display: 'flex', flexDirection: 'column', gap: 2 }}>
-          <Typography variant="h6" fontWeight="bold" color="text.primary">
-            📆 연간 업무 플래너
-          </Typography>
-          <PlannerTable year={year} onError={showError} />
-        </Box>
+      <Box sx={{ minHeight: '100vh', bgcolor: '#ffffff', p: 2 }}>
+        <PlannerTable year={year} onError={showError} />
         {toast && (
           <Toast
             message={toast.message}

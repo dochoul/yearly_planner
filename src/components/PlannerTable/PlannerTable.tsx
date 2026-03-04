@@ -11,11 +11,12 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
-import { useCategories, useAddCategory } from '../../hooks/useCategories';
+import { useCategories } from '../../hooks/useCategories';
 import { useWorkEntries } from '../../hooks/useWorkEntries';
 import type { WorkEntry } from '../../types';
 import { TableHeader } from './TableHeader';
 import { CategoryRow } from './CategoryRow';
+import { CategoryAddModal } from '../CategoryAddModal';
 
 const CATEGORY_COL_WIDTH = 140;
 const DEFAULT_MONTH_WIDTH = 150;
@@ -28,7 +29,7 @@ interface PlannerTableProps {
 export function PlannerTable({ year, onError }: PlannerTableProps) {
   const { data: categories = [], isLoading: catLoading } = useCategories();
   const { data: entries = [], isLoading: entryLoading } = useWorkEntries(year);
-  const addCategory = useAddCategory();
+  const [addModalOpen, setAddModalOpen] = useState(false);
   const [colWidths, setColWidths] = useState<number[]>(() => {
     try {
       const saved = localStorage.getItem('planner-col-widths');
@@ -60,13 +61,6 @@ export function PlannerTable({ year, onError }: PlannerTableProps) {
     return map;
   }, [entries]);
 
-  const handleAddCategory = () => {
-    const order = categories.length;
-    addCategory.mutate(
-      { name: '새 카테고리', order },
-      { onError: () => onError('카테고리 추가에 실패했습니다.') }
-    );
-  };
 
   if (catLoading || entryLoading) {
     return (
@@ -78,54 +72,68 @@ export function PlannerTable({ year, onError }: PlannerTableProps) {
   }
 
   return (
-    <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
-      <Table size="small" sx={{ tableLayout: 'fixed', borderCollapse: 'collapse', '& td, & th': { border: '1px solid #ccd4e3' } }}>
-        <colgroup>
-          <col style={{ width: CATEGORY_COL_WIDTH }} />
-          {colWidths.map((w, i) => (
-            <col key={i} style={{ width: w }} />
-          ))}
-        </colgroup>
-        <TableHead sx={{ position: 'sticky', top: 0, zIndex: 10 }}>
-          <TableHeader colWidths={colWidths} onResize={handleResize} />
-        </TableHead>
-        <TableBody>
-          {categories.map((cat) => (
-            <CategoryRow
-              key={cat.id}
-              category={cat}
-              entries={entriesMap.get(cat.id) ?? new Map()}
-              year={year}
-              onError={onError}
-            />
-          ))}
-          <TableRow>
-            <TableCell
-              sx={{
-                position: 'sticky',
-                left: 0,
-                zIndex: 10,
-                bgcolor: 'background.paper',
-                py: 1,
-                px: 1.5,
-              }}
-            >
-              <Button
-                onClick={handleAddCategory}
-                startIcon={<AddIcon />}
-                size="small"
-                variant="text"
-                sx={{ fontSize: '0.75rem' }}
-              >
-                카테고리 추가
-              </Button>
-            </TableCell>
-            {Array.from({ length: 12 }, (_, i) => (
-              <TableCell key={i} />
+    <Box>
+      <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', mb: 2 }}>
+        <Typography variant="h5" fontWeight="bold" color="text.primary">
+          📆 연간 업무 플래너
+        </Typography>
+        <Button
+          onClick={() => setAddModalOpen(true)}
+          startIcon={<AddIcon />}
+          variant="outlined"
+          size="medium"
+          sx={{
+            fontWeight: 600,
+            borderRadius: 5,
+            px: 2,
+            py: 0.75,
+            border: '1.5px solid #d1d5db',
+            color: '#374151',
+            bgcolor: 'white',
+            '&:hover': { bgcolor: '#f3f4f6', borderColor: '#9ca3af' },
+          }}
+        >
+          카테고리 추가
+        </Button>
+      </Box>
+      <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
+        <Table size="small" sx={{ tableLayout: 'fixed', borderCollapse: 'collapse', '& td, & th': { border: '1px solid #ccd4e3' } }}>
+          <colgroup>
+            <col style={{ width: CATEGORY_COL_WIDTH }} />
+            {colWidths.map((w, i) => (
+              <col key={i} style={{ width: w }} />
             ))}
-          </TableRow>
-        </TableBody>
-      </Table>
-    </TableContainer>
+          </colgroup>
+          <TableHead sx={{ position: 'sticky', top: 0, zIndex: 10 }}>
+            <TableHeader colWidths={colWidths} onResize={handleResize} />
+          </TableHead>
+          <TableBody>
+            {categories.map((cat) => (
+              <CategoryRow
+                key={cat.id}
+                category={cat}
+                entries={entriesMap.get(cat.id) ?? new Map()}
+                year={year}
+                onError={onError}
+              />
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      <Box sx={{ mt: 1.5, display: 'flex', gap: 3, px: 0.5 }}>
+        <Typography variant="body2" color="text.secondary">
+          총 카테고리: {categories.length}개
+        </Typography>
+        <Typography variant="body2" color="text.secondary">
+          총 업무: {entries.length}개
+        </Typography>
+      </Box>
+      <CategoryAddModal
+        isOpen={addModalOpen}
+        onClose={() => setAddModalOpen(false)}
+        order={categories.length}
+        onError={onError}
+      />
+    </Box>
   );
 }
