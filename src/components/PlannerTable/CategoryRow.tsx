@@ -3,6 +3,7 @@ import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
+import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import type { Category, WorkEntry } from '../../types';
 import { CategoryEditModal } from '../CategoryEditModal';
@@ -20,7 +21,7 @@ export function CategoryRow({ category, entries, year, onError }: CategoryRowPro
 
   return (
     <>
-      <TableRow sx={{ '&:hover .edit-btn': { visibility: 'visible' } }}>
+      <TableRow>
         <TableCell
           sx={{
             position: 'sticky',
@@ -30,9 +31,10 @@ export function CategoryRow({ category, entries, year, onError }: CategoryRowPro
             verticalAlign: 'top',
             py: 1,
             px: 1.5,
+            '&:hover .edit-btn': { visibility: 'visible' },
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography variant="body2" fontWeight={500} sx={{ flex: 1, minWidth: 0 }}>
               {category.name}
             </Typography>
@@ -44,14 +46,15 @@ export function CategoryRow({ category, entries, year, onError }: CategoryRowPro
                 visibility: 'hidden',
                 ml: 'auto',
                 flexShrink: 0,
-                p: 0.25,
+                p: 0.5,
                 color: 'text.disabled',
-                '&:hover': { color: 'primary.main' },
+                borderRadius: '50%',
+                '&:hover': { color: 'primary.main', bgcolor: 'action.hover' },
               }}
             >
               <EditIcon sx={{ fontSize: 14 }} />
             </IconButton>
-          </div>
+          </Box>
         </TableCell>
         {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
           <WorkCell

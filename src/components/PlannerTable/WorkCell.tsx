@@ -102,12 +102,12 @@ export function WorkCell({ categoryId, month, year, entries, onError }: WorkCell
             variant="caption"
             onClick={() => setIsAddOpen(true)}
             sx={{
-              color: '#9ca3af',
+              color: 'text.disabled',
               cursor: 'pointer',
               userSelect: 'none',
               textAlign: 'center',
               py: 0.25,
-              '&:hover': { color: '#4b5563' },
+              '&:hover': { color: 'text.secondary' },
             }}
           >
             + 추가

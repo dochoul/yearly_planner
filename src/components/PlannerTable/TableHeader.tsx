@@ -27,12 +27,14 @@ export function TableHeader({ colWidths, onResize }: TableHeaderProps) {
   };
 
   const headerCellSx = {
-    bgcolor: '#dce8fb',
-    color: '#1e3a5f',
+    bgcolor: (theme: import('@mui/material').Theme) =>
+      theme.palette.mode === 'light' ? '#dce8fb' : '#1a2a3a',
+    color: (theme: import('@mui/material').Theme) =>
+      theme.palette.mode === 'light' ? '#1e3a5f' : '#90caf9',
     fontWeight: 700,
     fontSize: '0.85rem',
     letterSpacing: '0.02em',
-    borderColor: '#c2d4ee',
+    borderColor: 'divider',
     py: 1.25,
     position: 'sticky' as const,
     top: 0,

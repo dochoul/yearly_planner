@@ -7,10 +7,14 @@ import TableBody from '@mui/material/TableBody';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import Tooltip from '@mui/material/Tooltip';
 import CircularProgress from '@mui/material/CircularProgress';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import AddIcon from '@mui/icons-material/Add';
+import DarkModeIcon from '@mui/icons-material/DarkMode';
+import LightModeIcon from '@mui/icons-material/LightMode';
 import { useCategories } from '../../hooks/useCategories';
 import { useWorkEntries } from '../../hooks/useWorkEntries';
 import type { WorkEntry } from '../../types';
@@ -24,9 +28,11 @@ const DEFAULT_MONTH_WIDTH = 150;
 interface PlannerTableProps {
   year: number;
   onError: (msg: string) => void;
+  mode: 'light' | 'dark';
+  onToggleMode: () => void;
 }
 
-export function PlannerTable({ year, onError }: PlannerTableProps) {
+export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTableProps) {
   const { data: categories = [], isLoading: catLoading } = useCategories();
   const { data: entries = [], isLoading: entryLoading } = useWorkEntries(year);
   const [addModalOpen, setAddModalOpen] = useState(false);
@@ -77,27 +83,33 @@ export function PlannerTable({ year, onError }: PlannerTableProps) {
         <Typography variant="h5" fontWeight="bold" color="text.primary">
           📆 연간 업무 플래너
         </Typography>
-        <Button
-          onClick={() => setAddModalOpen(true)}
-          startIcon={<AddIcon />}
-          variant="outlined"
-          size="medium"
-          sx={{
-            fontWeight: 600,
-            borderRadius: 5,
-            px: 2,
-            py: 0.75,
-            border: '1.5px solid #d1d5db',
-            color: '#374151',
-            bgcolor: 'white',
-            '&:hover': { bgcolor: '#f3f4f6', borderColor: '#9ca3af' },
-          }}
-        >
-          카테고리 추가
-        </Button>
+        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+          <Tooltip title={mode === 'light' ? '다크 모드' : '라이트 모드'}>
+            <IconButton onClick={onToggleMode} size="small" sx={{ color: 'text.secondary' }}>
+              {mode === 'light' ? <DarkModeIcon fontSize="small" /> : <LightModeIcon fontSize="small" />}
+            </IconButton>
+          </Tooltip>
+          <Button
+            onClick={() => setAddModalOpen(true)}
+            startIcon={<AddIcon />}
+            variant="outlined"
+            size="medium"
+            sx={{
+              fontWeight: 600,
+              borderRadius: 5,
+              px: 2,
+              py: 0.75,
+              borderColor: 'divider',
+              color: 'text.primary',
+              '&:hover': { bgcolor: 'action.hover', borderColor: 'text.disabled' },
+            }}
+          >
+            카테고리 추가
+          </Button>
+        </Box>
       </Box>
       <TableContainer component={Paper} elevation={0} sx={{ borderRadius: 0 }}>
-        <Table size="small" sx={{ tableLayout: 'fixed', borderCollapse: 'collapse', '& td, & th': { border: '1px solid #ccd4e3' } }}>
+        <Table size="small" sx={{ tableLayout: 'fixed', borderCollapse: 'collapse', '& td, & th': { border: '1px solid', borderColor: 'divider' } }}>
           <colgroup>
             <col style={{ width: CATEGORY_COL_WIDTH }} />
             {colWidths.map((w, i) => (
