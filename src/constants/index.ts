@@ -12,9 +12,11 @@ export const MONTH_EMOJIS = [
 
 export const ENTRY_COLORS: { value: EntryColor; label: string; hex: string }[] = [
   { value: 'red',    label: '오류/장애',         hex: '#ef4444' },
-  { value: 'orange', label: '이슈',               hex: '#f97316' },
+  { value: 'orange', label: '이슈',               hex: '#f59e0b' },
   { value: 'green',  label: '공지/EMS',           hex: '#22c55e' },
   { value: 'blue',   label: '오픈/개편/기능추가', hex: '#3b82f6' },
+  { value: 'gray',   label: '종료',               hex: '#9ca3af' },
+  { value: 'dark',   label: '팀 내부 이슈',       hex: '#374151' },
 ];
 
 export const HIGHLIGHT_BG: Record<EntryColor, string> = {
@@ -22,4 +24,6 @@ export const HIGHLIGHT_BG: Record<EntryColor, string> = {
   orange: 'bg-orange-100',
   green:  'bg-green-100',
   blue:   'bg-blue-100',
+  gray:   'bg-gray-100',
+  dark:   'bg-gray-200',
 };

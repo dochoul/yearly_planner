@@ -11,7 +11,7 @@ create table public.work_entries (
   year        integer not null,
   month       integer not null check (month between 1 and 12),
   color       text not null default 'blue'
-                check (color in ('red', 'blue', 'green', 'orange')),
+                check (color in ('red', 'orange', 'green', 'blue', 'gray', 'dark')),
   text        text not null,
   date_type   text not null default 'single'
                 check (date_type in ('single', 'range')),

@@ -9,10 +9,12 @@ import { EntryFormModal } from '../EntryForm/EntryFormModal';
 import { useDeleteWorkEntry } from '../../hooks/useWorkEntries';
 
 const COLOR_BG: Record<string, string> = {
-  red: '#ef4444',
-  blue: '#3b82f6',
-  green: '#22c55e',
-  orange: '#f97316',
+  red:    '#ef4444',
+  orange: '#f59e0b',
+  green:  '#22c55e',
+  blue:   '#3b82f6',
+  gray:   '#9ca3af',
+  dark:   '#374151',
 };
 
 interface WorkCellProps {
