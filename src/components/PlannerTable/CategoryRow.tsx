@@ -5,7 +5,6 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import { useSortable } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import type { Category, WorkEntry } from '../../types';
@@ -34,6 +33,7 @@ export function CategoryRow({ category, entries, year, onError, visibleMonths }:
     <>
       <TableRow ref={setNodeRef} style={rowStyle} {...attributes}>
         <TableCell
+          {...listeners}
           sx={{
             position: 'sticky',
             left: 0,
@@ -42,31 +42,19 @@ export function CategoryRow({ category, entries, year, onError, visibleMonths }:
             verticalAlign: 'top',
             py: 1,
             px: 1.5,
+            cursor: isDragging ? 'grabbing' : 'grab',
+            userSelect: 'none',
+            touchAction: 'none',
             '&:hover .edit-btn': { visibility: 'visible' },
-            '&:hover .drag-handle': { opacity: 1 },
           }}
         >
-          <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 0.5 }}>
-            <DragIndicatorIcon
-              className="drag-handle"
-              {...listeners}
-              sx={{
-                position: 'absolute',
-                left: -14,
-                fontSize: 16,
-                color: 'text.disabled',
-                cursor: isDragging ? 'grabbing' : 'grab',
-                opacity: 0,
-                transition: 'opacity 0.15s',
-                touchAction: 'none',
-              }}
-            />
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <Typography variant="body2" fontWeight={500} sx={{ flex: 1, minWidth: 0 }}>
               {category.name}
             </Typography>
             <IconButton
               className="edit-btn"
-              onClick={() => setModalOpen(true)}
+              onClick={(e) => { e.stopPropagation(); setModalOpen(true); }}
               size="small"
               sx={{
                 visibility: 'hidden',
