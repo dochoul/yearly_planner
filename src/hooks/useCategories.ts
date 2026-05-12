@@ -66,6 +66,34 @@ export function useUpdateCategory() {
   });
 }
 
+export function useReorderCategories() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: async (updates: { id: string; order: number }[]) => {
+      await Promise.all(
+        updates.map(({ id, order }) =>
+          supabase.from('categories').update({ order }).eq('id', id)
+        )
+      );
+    },
+    onMutate: async (updates) => {
+      await queryClient.cancelQueries({ queryKey: categoryKeys.all });
+      const previous = queryClient.getQueryData<Category[]>(categoryKeys.all);
+      queryClient.setQueryData<Category[]>(categoryKeys.all, (old = []) => {
+        const orderMap = new Map(updates.map(({ id, order }) => [id, order]));
+        return [...old]
+          .map((c) => ({ ...c, order: orderMap.get(c.id) ?? c.order }))
+          .sort((a, b) => a.order - b.order);
+      });
+      return { previous };
+    },
+    onError: (_err, _vars, context) => {
+      queryClient.setQueryData(categoryKeys.all, context?.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: categoryKeys.all }),
+  });
+}
+
 export function useDeleteCategory() {
   const queryClient = useQueryClient();
   return useMutation({

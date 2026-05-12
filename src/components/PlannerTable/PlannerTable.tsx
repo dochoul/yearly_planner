@@ -1,4 +1,7 @@
 import { useMemo, useState, useCallback } from 'react';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
+import type { DragEndEvent } from '@dnd-kit/core';
+import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
 import Table from '@mui/material/Table';
@@ -19,7 +22,7 @@ import AddIcon from '@mui/icons-material/Add';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import DarkModeIcon from '@mui/icons-material/DarkMode';
 import LightModeIcon from '@mui/icons-material/LightMode';
-import { useCategories } from '../../hooks/useCategories';
+import { useCategories, useReorderCategories } from '../../hooks/useCategories';
 import { useWorkEntries } from '../../hooks/useWorkEntries';
 import type { WorkEntry } from '../../types';
 import { TableHeader } from './TableHeader';
@@ -58,6 +61,8 @@ interface PlannerTableProps {
 export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTableProps) {
   const { data: categories = [], isLoading: catLoading } = useCategories();
   const { data: entries = [], isLoading: entryLoading } = useWorkEntries(year);
+  const reorderCategories = useReorderCategories();
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>('full');
   const [quarterMenuAnchor, setQuarterMenuAnchor] = useState<null | HTMLElement>(null);
@@ -80,6 +85,15 @@ export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTable
       return next;
     });
   }, []);
+
+  const handleDragEnd = useCallback((event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+    const oldIndex = categories.findIndex((c) => c.id === active.id);
+    const newIndex = categories.findIndex((c) => c.id === over.id);
+    const reordered = arrayMove(categories, oldIndex, newIndex);
+    reorderCategories.mutate(reordered.map((cat, i) => ({ id: cat.id, order: i })));
+  }, [categories, reorderCategories]);
 
   const visibleMonths = VIEW_MONTHS[viewMode];
   const isQuarterMode = ['q1', 'q2', 'q3', 'q4'].includes(viewMode);
@@ -195,18 +209,22 @@ export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTable
           <TableHead sx={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <TableHeader colWidths={colWidths} onResize={handleResize} visibleMonths={visibleMonths} />
           </TableHead>
-          <TableBody>
-            {categories.map((cat) => (
-              <CategoryRow
-                key={cat.id}
-                category={cat}
-                entries={entriesMap.get(cat.id) ?? new Map()}
-                year={year}
-                onError={onError}
-                visibleMonths={visibleMonths}
-              />
-            ))}
-          </TableBody>
+          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+            <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
+              <TableBody>
+                {categories.map((cat) => (
+                  <CategoryRow
+                    key={cat.id}
+                    category={cat}
+                    entries={entriesMap.get(cat.id) ?? new Map()}
+                    year={year}
+                    onError={onError}
+                    visibleMonths={visibleMonths}
+                  />
+                ))}
+              </TableBody>
+            </SortableContext>
+          </DndContext>
         </Table>
       </TableContainer>
       <Box sx={{ mt: 1.5, display: 'flex', gap: 3, px: 0.5 }}>

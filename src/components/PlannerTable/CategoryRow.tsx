@@ -5,6 +5,9 @@ import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
+import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import type { Category, WorkEntry } from '../../types';
 import { CategoryEditModal } from '../CategoryEditModal';
 import { WorkCell } from './WorkCell';
@@ -19,10 +22,17 @@ interface CategoryRowProps {
 
 export function CategoryRow({ category, entries, year, onError, visibleMonths }: CategoryRowProps) {
   const [modalOpen, setModalOpen] = useState(false);
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: category.id });
+
+  const rowStyle = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
 
   return (
     <>
-      <TableRow>
+      <TableRow ref={setNodeRef} style={rowStyle} {...attributes} sx={{ '&:hover .drag-handle': { opacity: 1 } }}>
         <TableCell
           sx={{
             position: 'sticky',
@@ -31,11 +41,24 @@ export function CategoryRow({ category, entries, year, onError, visibleMonths }:
             bgcolor: 'background.paper',
             verticalAlign: 'top',
             py: 1,
-            px: 1.5,
+            px: 1,
             '&:hover .edit-btn': { visibility: 'visible' },
           }}
         >
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+            <DragIndicatorIcon
+              className="drag-handle"
+              {...listeners}
+              sx={{
+                fontSize: 16,
+                color: 'text.disabled',
+                cursor: isDragging ? 'grabbing' : 'grab',
+                opacity: 0,
+                transition: 'opacity 0.15s',
+                flexShrink: 0,
+                touchAction: 'none',
+              }}
+            />
             <Typography variant="body2" fontWeight={500} sx={{ flex: 1, minWidth: 0 }}>
               {category.name}
             </Typography>
