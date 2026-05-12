@@ -5,9 +5,10 @@ import { MONTHS } from '../../constants';
 interface TableHeaderProps {
   colWidths: number[];
   onResize: (index: number, width: number) => void;
+  visibleMonths: number[];
 }
 
-export function TableHeader({ colWidths, onResize }: TableHeaderProps) {
+export function TableHeader({ colWidths, onResize, visibleMonths }: TableHeaderProps) {
   const startResize = (e: React.MouseEvent, index: number) => {
     e.preventDefault();
     const startX = e.clientX;
@@ -53,26 +54,29 @@ export function TableHeader({ colWidths, onResize }: TableHeaderProps) {
       >
         업무 카테고리
       </TableCell>
-      {MONTHS.map((month, i) => (
-        <TableCell
-          key={month}
-          align="center"
-          sx={{ ...headerCellSx, position: 'relative' as const }}
-        >
-          {month}
-          <div
-            onMouseDown={(e) => startResize(e, i)}
-            style={{
-              position: 'absolute',
-              top: 0,
-              right: 0,
-              height: '100%',
-              width: 6,
-              cursor: 'col-resize',
-            }}
-          />
-        </TableCell>
-      ))}
+      {visibleMonths.map((month) => {
+        const i = month - 1;
+        return (
+          <TableCell
+            key={month}
+            align="center"
+            sx={{ ...headerCellSx, position: 'relative' as const }}
+          >
+            {MONTHS[i]}
+            <div
+              onMouseDown={(e) => startResize(e, i)}
+              style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                height: '100%',
+                width: 6,
+                cursor: 'col-resize',
+              }}
+            />
+          </TableCell>
+        );
+      })}
     </TableRow>
   );
 }

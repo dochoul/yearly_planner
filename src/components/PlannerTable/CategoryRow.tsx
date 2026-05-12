@@ -14,9 +14,10 @@ interface CategoryRowProps {
   entries: Map<number, WorkEntry[]>;
   year: number;
   onError: (msg: string) => void;
+  visibleMonths: number[];
 }
 
-export function CategoryRow({ category, entries, year, onError }: CategoryRowProps) {
+export function CategoryRow({ category, entries, year, onError, visibleMonths }: CategoryRowProps) {
   const [modalOpen, setModalOpen] = useState(false);
 
   return (
@@ -56,7 +57,7 @@ export function CategoryRow({ category, entries, year, onError }: CategoryRowPro
             </IconButton>
           </Box>
         </TableCell>
-        {Array.from({ length: 12 }, (_, i) => i + 1).map((month) => (
+        {visibleMonths.map((month) => (
           <WorkCell
             key={month}
             categoryId={category.id}
