@@ -6,8 +6,6 @@ import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import EditIcon from '@mui/icons-material/Edit';
 import { useSortable } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
-// CSS.Translate 은 scale 없이 이동만 적용 → 테이블 행 왜곡 방지
 import type { Category, WorkEntry } from '../../types';
 import { CategoryEditModal } from '../CategoryEditModal';
 import { WorkCell } from './WorkCell';
@@ -22,12 +20,11 @@ interface CategoryRowProps {
 
 export function CategoryRow({ category, entries, year, onError, visibleMonths }: CategoryRowProps) {
   const [modalOpen, setModalOpen] = useState(false);
-  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: category.id });
+  const { attributes, listeners, setNodeRef, isDragging } = useSortable({ id: category.id });
 
   const rowStyle = {
-    transform: CSS.Translate.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
+    opacity: isDragging ? 0 : 1,
+    transition: 'opacity 0.15s',
   };
 
   return (

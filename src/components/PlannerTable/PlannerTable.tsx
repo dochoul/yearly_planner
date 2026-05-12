@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback } from 'react';
-import { DndContext, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
-import type { DragEndEvent } from '@dnd-kit/core';
+import { DndContext, closestCenter, PointerSensor, useSensor, useSensors, DragOverlay } from '@dnd-kit/core';
+import type { DragEndEvent, DragStartEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import Paper from '@mui/material/Paper';
 import TableContainer from '@mui/material/TableContainer';
@@ -63,6 +63,8 @@ export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTable
   const { data: entries = [], isLoading: entryLoading } = useWorkEntries(year);
   const reorderCategories = useReorderCategories();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
+  const [activeId, setActiveId] = useState<string | null>(null);
+  const activeCategory = categories.find((c) => c.id === activeId);
   const [addModalOpen, setAddModalOpen] = useState(false);
   const [viewMode, setViewMode] = useState<ViewMode>(() => {
     const saved = localStorage.getItem('planner-view-mode');
@@ -94,7 +96,12 @@ export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTable
     });
   }, []);
 
+  const handleDragStart = useCallback((event: DragStartEvent) => {
+    setActiveId(event.active.id as string);
+  }, []);
+
   const handleDragEnd = useCallback((event: DragEndEvent) => {
+    setActiveId(null);
     const { active, over } = event;
     if (!over || active.id === over.id) return;
     const oldIndex = categories.findIndex((c) => c.id === active.id);
@@ -217,7 +224,13 @@ export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTable
           <TableHead sx={{ position: 'sticky', top: 0, zIndex: 10 }}>
             <TableHeader colWidths={colWidths} onResize={handleResize} visibleMonths={visibleMonths} />
           </TableHead>
-          <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragStart={handleDragStart}
+            onDragEnd={handleDragEnd}
+            onDragCancel={() => setActiveId(null)}
+          >
             <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
               <TableBody>
                 {categories.map((cat) => (
@@ -232,6 +245,27 @@ export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTable
                 ))}
               </TableBody>
             </SortableContext>
+            <DragOverlay>
+              {activeCategory && (
+                <Box sx={{
+                  px: 1.5,
+                  py: 0.75,
+                  bgcolor: 'background.paper',
+                  border: '1px solid',
+                  borderColor: 'primary.main',
+                  borderRadius: 1,
+                  boxShadow: 4,
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  minWidth: CATEGORY_COL_WIDTH,
+                  cursor: 'grabbing',
+                }}>
+                  <Typography variant="body2" fontWeight={600} color="primary.main">
+                    {activeCategory.name}
+                  </Typography>
+                </Box>
+              )}
+            </DragOverlay>
           </DndContext>
         </Table>
       </TableContainer>
