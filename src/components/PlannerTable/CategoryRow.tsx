@@ -32,7 +32,7 @@ export function CategoryRow({ category, entries, year, onError, visibleMonths }:
 
   return (
     <>
-      <TableRow ref={setNodeRef} style={rowStyle} {...attributes} sx={{ '&:hover .drag-handle': { opacity: 1 } }}>
+      <TableRow ref={setNodeRef} style={rowStyle} {...attributes}>
         <TableCell
           sx={{
             position: 'sticky',
@@ -41,21 +41,23 @@ export function CategoryRow({ category, entries, year, onError, visibleMonths }:
             bgcolor: 'background.paper',
             verticalAlign: 'top',
             py: 1,
-            px: 1,
+            px: 1.5,
             '&:hover .edit-btn': { visibility: 'visible' },
+            '&:hover .drag-handle': { opacity: 1 },
           }}
         >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: 0.5 }}>
+          <Box sx={{ position: 'relative', display: 'flex', alignItems: 'center', gap: 0.5 }}>
             <DragIndicatorIcon
               className="drag-handle"
               {...listeners}
               sx={{
+                position: 'absolute',
+                left: -14,
                 fontSize: 16,
                 color: 'text.disabled',
                 cursor: isDragging ? 'grabbing' : 'grab',
                 opacity: 0,
                 transition: 'opacity 0.15s',
-                flexShrink: 0,
                 touchAction: 'none',
               }}
             />
