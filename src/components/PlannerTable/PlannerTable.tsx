@@ -64,7 +64,15 @@ export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTable
   const reorderCategories = useReorderCategories();
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 5 } }));
   const [addModalOpen, setAddModalOpen] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>('full');
+  const [viewMode, setViewMode] = useState<ViewMode>(() => {
+    const saved = localStorage.getItem('planner-view-mode');
+    return (saved as ViewMode) ?? 'full';
+  });
+
+  const changeViewMode = (mode: ViewMode) => {
+    setViewMode(mode);
+    localStorage.setItem('planner-view-mode', mode);
+  };
   const [quarterMenuAnchor, setQuarterMenuAnchor] = useState<null | HTMLElement>(null);
   const [colWidths, setColWidths] = useState<number[]>(() => {
     try {
@@ -158,7 +166,7 @@ export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTable
           {(['full', 'h1', 'h2'] as const).map((m) => (
             <Button
               key={m}
-              onClick={() => setViewMode(m)}
+              onClick={() => changeViewMode(m)}
               sx={{
                 color: viewMode === m ? 'primary.contrastText' : 'text.secondary',
                 bgcolor: viewMode === m ? 'primary.main' : 'transparent',
@@ -190,7 +198,7 @@ export function PlannerTable({ year, onError, mode, onToggleMode }: PlannerTable
             <MenuItem
               key={q}
               selected={viewMode === q}
-              onClick={() => { setViewMode(q); setQuarterMenuAnchor(null); }}
+              onClick={() => { changeViewMode(q); setQuarterMenuAnchor(null); }}
               sx={{ fontSize: '0.85rem' }}
             >
               {QUARTER_LABELS[q]}
